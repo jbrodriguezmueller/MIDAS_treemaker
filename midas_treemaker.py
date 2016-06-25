@@ -1,13 +1,12 @@
+#!/usr/bin/python
 from Bio import SeqIO, AlignIO, Phylo
 import os, argparse
 import commands, subprocess
 from collections import defaultdict
 
 def read_many_alns( list_of_files, debug=False ):
-  """Reads a list of (fasta) filenames, returns dict with headers:seqs"""
+  """Reads a list of (fasta aln) filenames, returns dict with headers:seqs"""
   all_seqs = {}
-  #all_seqs_sp = defaultdict( dict )
-  #all_seqs_pr = defaultdict( dict )
   for filex in list_of_files:
     fasta_sequences = AlignIO.parse(open(filex),'fasta')
     fasta_list = fasta_sequences.next()
@@ -111,7 +110,10 @@ def get_species_from_db( argsdict ):
          out_file.write( str(all_seqs[key]) + "\n" )
     print "comparing",key,pieces[-1]
     out_file.close()
-    subprocess.call( ['muscle','-in',f1s,'-out',f1a])
+    sysnulldev = open( os.devnull, 'w' )
+    subprocess.call( ['muscle','-in',f1s,'-out',f1a], 
+                     stdout=sysnulldev, stderr=sysnulldev)
+    sysnulldev.close()
 
   aln_seqs = read_many_alns( aln_files )
   good_lens = nominal_lens(aln_seqs)
@@ -133,7 +135,7 @@ def get_species_from_db( argsdict ):
     f.write(">"+species+"\n")
     f.write(big_protein+"\n")
   f.close()
-  if argsdict['debug']!='0':
+  if argsdict['debug']:
     print subseqs.keys()
     print good_lens
 
@@ -209,26 +211,17 @@ def main():
 
   parser = argparse.ArgumentParser(description='ML classifier try 1')
 
-  parser.add_argument('--if', 
-                      help='Input file (seq ids)', 
-                      required=False, 
-                      default='input.ids')
-  parser.add_argument('--df', 
-                      help='Ref database file (fasta)', 
-                      required=False, 
-                      default='phyeco.fa')
-  parser.add_argument('--pf', 
-                      help='Protein list file',
-                      required=False, 
-                      default='protein.ids')
+  parser.add_argument('--if', help='Input file (seq ids)', 
+                      required=False, default='input.ids')
+  parser.add_argument('--df', help='Ref database file (fasta)', 
+                      required=False, default='phyeco.fa')
+  parser.add_argument('--pf', help='Protein list file',
+                      required=False, default='protein.ids')
   min_cov_position_help = """Minimum coverage for a given position of the gene 
                              alignment to be considered into the combined 
                              alignment, float val in [0,1]."""
-  parser.add_argument('--min_cov_position', 
-                      help = min_cov_position_help,
-                      type = float,
-                      required=False, 
-                      default=0.5)
+  parser.add_argument('--min_cov_position', help = min_cov_position_help,
+                      type = float, required=False, default=0.5)
   oname_help = """base name for output files and dir, it will create a dir 
                   called ONAME, and put intermediate files. Tree will be 
                   named ONAME.tree, final alignment will be called ONAME.aln"""
@@ -240,10 +233,8 @@ def main():
   parser.add_argument('--overwrite', 
                       help=overwrite_help, 
                       required=False, default='0')
-  parser.add_argument('--debug',
-                      help='Write debug info', 
-                      required=False,
-                      default='0')
+  parser.add_argument('--debug', help='Write debug info', 
+                      required=False, type=bool, default=False)
 
   args = parser.parse_args()
   argsdict = vars(args)
