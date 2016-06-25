@@ -110,7 +110,9 @@ def get_species_from_db( argsdict ):
       if protein in pieces[-1]:
          out_file.write( ">" + key + "\n" )
          out_file.write( str(all_seqs[key]) + "\n" )
-    print "comparing",key,pieces[-1]
+    if argsdict['debug']:
+      print "Working on",key,pieces[-1]
+      print "Working on",protein
     out_file.close()
     sysnulldev = open( os.devnull, 'w' )
     subprocess.call( ['muscle','-in',f1s,'-out',f1a], 
@@ -126,14 +128,14 @@ def get_species_from_db( argsdict ):
     for protein in req_proteins:
       goodseqs = query_protein(subseqs, protein)
       if len(goodseqs) > 1:
-        print "Error: len(goodseqs)>1, that means the alignment failed somehow."
+        print("Error: len(goodseqs)>1, that means the alignment failed somehow.")
+        print("Error: Bailing out ...")
         exit(-1)
       elif len(goodseqs) < 1:
-        print "Fix me?"
+        print("Fixing missing sequence, adding dashes for species="+species+" and protein="+protein)
         big_protein += good_lens[ protein ] * '-'
       else:
         big_protein += str( goodseqs[ goodseqs.keys()[0] ] )
-    #f.write(">"+species+"_combo_aln\n")
     f.write(">"+species+"\n")
     f.write(big_protein+"\n")
   f.close()
@@ -188,11 +190,12 @@ def filter_tree( argsdict ):
     f.write(out_str+"\n")
   f.close()
   print len(mask_str), len(out_str)
-  commands.getoutput( 'FastTree -nt '+filtered_aln_f+' > '+filtered_aln_f+'_tree' )
   x1 = 'FastTree -nt %s > %s_tree' % ( filtered_aln_f, filtered_aln_f )
-  print x1
+  print("About to execute : "+x1)
+  commands.getoutput( 'FastTree -nt '+filtered_aln_f+' > '+filtered_aln_f+'_tree' )
+  #sysnulldev = open( os.devnull, 'w' )
   #subprocess.call( 'FastTree -nt %s > %s_tree' % ( filtered_aln_f, filtered_aln_f),
-                   stdout=sysnulldev, stderr=sysnulldev )
+  #                 stdout=sysnulldev, stderr=sysnulldev )
 
   #
   f = open( filtered_aln_f + "_tree" )
