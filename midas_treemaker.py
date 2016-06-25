@@ -16,7 +16,9 @@ def read_many_alns( list_of_files, debug=False ):
     for fasta in fasta_list:
       name, sequence = fasta.id, fasta.seq
       all_seqs[ name ] = sequence
-  print sequence
+  if debug:
+    print("Example sequence: ")
+    print(sequence)
   return all_seqs
 
 def nominal_lens( all_seqs ):
@@ -187,6 +189,10 @@ def filter_tree( argsdict ):
   f.close()
   print len(mask_str), len(out_str)
   commands.getoutput( 'FastTree -nt '+filtered_aln_f+' > '+filtered_aln_f+'_tree' )
+  x1 = 'FastTree -nt %s > %s_tree' % ( filtered_aln_f, filtered_aln_f )
+  print x1
+  #subprocess.call( 'FastTree -nt %s > %s_tree' % ( filtered_aln_f, filtered_aln_f),
+                   stdout=sysnulldev, stderr=sysnulldev )
 
   #
   f = open( filtered_aln_f + "_tree" )
