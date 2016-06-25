@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from Bio import SeqIO, AlignIO, Phylo
 import os, argparse
-import commands, subprocess
+import subprocess
 from collections import defaultdict
 
 def read_many_alns( list_of_files, debug=False ):
@@ -190,13 +190,9 @@ def filter_tree( argsdict ):
     f.write(out_str+"\n")
   f.close()
   print len(mask_str), len(out_str)
-  x1 = 'FastTree -nt %s > %s_tree' % ( filtered_aln_f, filtered_aln_f )
-  print("About to execute : "+x1)
-  commands.getoutput( 'FastTree -nt '+filtered_aln_f+' > '+filtered_aln_f+'_tree' )
-  #sysnulldev = open( os.devnull, 'w' )
-  #subprocess.call( 'FastTree -nt %s > %s_tree' % ( filtered_aln_f, filtered_aln_f),
-  #                 stdout=sysnulldev, stderr=sysnulldev )
-
+  FastTreeCMD = 'FastTree -nt %s > %s_tree' % ( filtered_aln_f, filtered_aln_f )
+  print("About to execute : "+FastTreeCMD)
+  subprocess.call( FastTreeCMD, shell=True )
   #
   f = open( filtered_aln_f + "_tree" )
   xxx = Phylo.read( f, format='newick' )
