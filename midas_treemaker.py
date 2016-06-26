@@ -217,11 +217,11 @@ def main():
   parser = argparse.ArgumentParser(description='ML classifier try 1')
 
   parser.add_argument('--if', help='Input file (seq ids)', 
-                      required=False, default='input.ids')
+                      required=False, default='auto')
   parser.add_argument('--df', help='Ref database file (fasta)', 
                       required=False, default='phyeco.fa')
   parser.add_argument('--pf', help='Protein list file',
-                      required=False, default='protein.ids')
+                      required=False, default='auto')
   min_cov_position_help = """Minimum coverage for a given position of the gene 
                              alignment to be considered into the combined 
                              alignment, float val in [0,1]."""
