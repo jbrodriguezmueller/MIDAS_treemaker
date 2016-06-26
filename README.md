@@ -18,6 +18,4 @@ Needs:
 
 ## Installation
 
-Assuming you have a folder called "~/bin" in your path, just type "make"
-and it will copy the script to ~/bin/midas_treemaker.py and change
-its permissions to executable.
+Assuming you have a folder called "~/bin" in your path, just type "make", and it will copy the script to ~/bin/midas_treemaker.py and change its permissions to executable.
