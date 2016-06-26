@@ -2,7 +2,11 @@
 
 Auxiliary script to help with some tree making tasks in MIDAS.
 For details on MIDAS, see https://github.com/snayfach/MIDAS/
-Tested in Linux, specifically Ubuntu Xenial.
+
+Tested in Linux, specifically Ubuntu Xenial. Should work in most
+Linuxes. *Might* work in macOS, if it doesn't, should only need
+trivial changes. I don't have an easy, reliable way to test it on
+macOS, so YMMV there.
 
 Needs:
 * FastTree http://www.microbesonline.org/fasttree/
