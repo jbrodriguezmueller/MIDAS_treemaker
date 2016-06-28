@@ -4,6 +4,15 @@ import os, argparse
 import subprocess
 from collections import defaultdict
 
+def purify_dna(one_seq):
+  bad_dna = [ 'B', 'D', 'E', 'F', 'H', 'I', 'J',
+              'K', 'L', 'M', 'O', 'P', 'Q', 'R',
+              'S', 'U', 'V', 'W', 'X', 'Y', 'Z' ]
+  out_seq = one_seq.upper()
+  for letter in bad_dna:
+    out_seq = out_seq.replace( letter, 'N' )
+  return out_seq
+
 def read_many_alns(list_of_files, debug=False):
   """Reads a list of (fasta aln) filenames, returns dict with headers:seqs"""
   all_seqs = {}
@@ -74,16 +83,17 @@ def get_species_from_db(argsdict):
   all_seqs = {}
   for fasta in fasta_sequences:
     name, sequence = fasta.id, fasta.seq
+    sequence_clean = purify_dna(str(sequence))
     for element in in_data:
       if element in name[0:len(element)+3]:
         out_file.write(">" + name + "\n")
-        out_file.write(str(sequence) + "\n")
-        all_seqs[name] = str(sequence)
+        out_file.write(sequence_clean + "\n")
+        all_seqs[name] = sequence_clean
   out_file.close()
 
   all_proteins = []
   req_proteins = read_ids(argsdict['pf'])
-  all_species = defaultdict(list )
+  all_species = defaultdict(list)
   for key in all_seqs:
     pieces = key.split('_')
     all_proteins.append(pieces[-1])
