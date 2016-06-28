@@ -57,17 +57,17 @@ def query_species(all_seqs, species):
     if species in pieces[0]:
       sp_matches[key] = all_seqs[key]
   return sp_matches
-def query_protein( all_seqs, protein ):
+def query_protein(all_seqs, protein):
   sp_matches = {}
   for key in all_seqs:
     pieces = key.split("_")
     if protein in pieces[-1]:
-      sp_matches[ key ] = all_seqs[key]
+      sp_matches[key] = all_seqs[key]
   return sp_matches
 
 def get_species_from_db(argsdict):
   fasta_sequences = SeqIO.parse(open(argsdict['df']),'fasta')
-  in_data = read_ids( argsdict['if'] )
+  in_data = read_ids(argsdict['if'])
   out_dict = {}
   out_file = open(argsdict['oname']+"/step1_out.txt", 'w')
   
@@ -76,19 +76,19 @@ def get_species_from_db(argsdict):
     name, sequence = fasta.id, fasta.seq
     for element in in_data:
       if element in name[0:len(element)+3]:
-        out_file.write( ">" + name + "\n" )
-        out_file.write( str(sequence) + "\n" )
+        out_file.write(">" + name + "\n")
+        out_file.write(str(sequence) + "\n")
         all_seqs[name] = str(sequence)
   out_file.close()
 
   all_proteins = []
-  req_proteins = read_ids( argsdict['pf'] )
+  req_proteins = read_ids(argsdict['pf'])
   all_species = defaultdict(list )
   for key in all_seqs:
     pieces = key.split('_')
-    all_proteins.append( pieces[-1] )
-    all_species[ pieces[0] ].append( pieces[-1] )
-  all_proteins = list( set( all_proteins))
+    all_proteins.append(pieces[-1])
+    all_species[pieces[0]].append( pieces[-1])
+  all_proteins = list(set(all_proteins))
 
   if argsdict['debug']:
     print "All proteins = ", all_proteins
@@ -103,19 +103,19 @@ def get_species_from_db(argsdict):
   for protein in req_proteins:
     f1s = base_name + protein + ".fa"
     f1a = base_name + protein + ".aln"
-    aln_files.append( f1a )
-    out_file = open(f1s , "w" )
+    aln_files.append(f1a)
+    out_file = open(f1s , "w")
     for key in all_seqs:
       pieces = key.split('_')
       if protein in pieces[-1]:
-         out_file.write( ">" + key + "\n" )
-         out_file.write( str(all_seqs[key]) + "\n" )
+         out_file.write(">" + key + "\n")
+         out_file.write(str(all_seqs[key]) + "\n")
     if argsdict['debug']:
       print "Working on",key,pieces[-1]
       print "Working on",protein
     out_file.close()
-    sysnulldev = open( os.devnull, 'w' )
-    subprocess.call( ['muscle','-in',f1s,'-out',f1a], 
+    sysnulldev = open(os.devnull, 'w')
+    subprocess.call(['muscle','-in',f1s,'-out',f1a], 
                      stdout=sysnulldev, stderr=sysnulldev)
     sysnulldev.close()
 
@@ -133,7 +133,7 @@ def get_species_from_db(argsdict):
         exit(-1)
       elif len(goodseqs) < 1:
         print("Fixing missing sequence, adding dashes for species="+species+" and protein="+protein)
-        big_protein += good_lens[ protein ] * '-'
+        big_protein += good_lens[protein] * '-'
       else:
         big_protein += str(goodseqs[goodseqs.keys()[0]])
     f.write(">"+species+"\n")
@@ -148,11 +148,11 @@ def filter_tree(argsdict):
   filtered_aln_f = argsdict['oname'] + "/" + argsdict['oname'] + "_filtered_"
   filtered_aln_f+= str(round(argsdict['min_cov_position'],2))+".aln"
 
-  seq_dict = read_many_alns([ full_aln_f])
+  seq_dict = read_many_alns([full_aln_f])
   full_aln_d = {}
   full_aa_d = {}
   for key in seq_dict:
-    full_aln_d[key] = str( seq_dict[key] )
+    full_aln_d[key] = str(seq_dict[key])
     #print key, len(str(seq_dict[key]))
   min_nt = int(argsdict['min_cov_position']*len(seq_dict))
   print("at least these sequences per position to be considered ... ", min_nt)
