@@ -119,7 +119,7 @@ def get_species_from_db(argsdict):
                      stdout=sysnulldev, stderr=sysnulldev)
     sysnulldev.close()
 
-  aln_seqs = read_many_alns( aln_files )
+  aln_seqs = read_many_alns(aln_files)
   good_lens = nominal_lens(aln_seqs)
   f = open(argsdict['oname']+"/final_unfiltered.aln","w")
   for species in all_species:
@@ -197,7 +197,6 @@ def filter_tree(argsdict):
   f = open(filtered_aln_f + "_tree")
   xxx = Phylo.read(f, format='newick')
   f.close()
-  #Phylo.draw( xxx )
 
 def main_seq(argsdict):
   try:
@@ -214,7 +213,7 @@ def main_seq(argsdict):
 
 def main():
 
-  parser = argparse.ArgumentParser(description='ML classifier try 1')
+  parser = argparse.ArgumentParser(description='Helper program for making trees w/MIDAS')
 
   parser.add_argument('--if', help='Input file (seq ids)', 
                       required=False, default='auto')
