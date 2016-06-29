@@ -134,7 +134,7 @@ def get_species_from_db(argsdict):
       print "Working on",protein
     out_file.close()
     sysnulldev = open(os.devnull, 'w')
-    #subprocess.call(['muscle','-in',f1s,'-out',f1a], stdout=sysnulldev, stderr=sysnulldev)
+    subprocess.call(['muscle','-in',f1s,'-out',f1a], stdout=sysnulldev, stderr=sysnulldev)
     sysnulldev.close()
 
   aln_seqs = read_many_alns(aln_files)
