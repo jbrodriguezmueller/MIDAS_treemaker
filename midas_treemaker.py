@@ -76,7 +76,8 @@ def query_protein(all_seqs, protein):
 
 def get_species_from_db(argsdict):
   fasta_sequences = SeqIO.parse(open(argsdict['df']),'fasta')
-  in_data = read_ids(argsdict['if'])
+  if argsdict['if'] != 'auto':
+    in_data = read_ids(argsdict['if'])
   out_dict = {}
   out_file = open(argsdict['oname']+"/step1_out.txt", 'w')
   
@@ -84,15 +85,20 @@ def get_species_from_db(argsdict):
   for fasta in fasta_sequences:
     name, sequence = fasta.id, fasta.seq
     sequence_clean = purify_dna(str(sequence))
-    for element in in_data:
-      if element in name[0:len(element)+3]:
-        out_file.write(">" + name + "\n")
-        out_file.write(sequence_clean + "\n")
-        all_seqs[name] = sequence_clean
+    if argsdict['if'] != 'auto':
+      for element in in_data:
+        if element in name[0:len(element)+3]:
+          out_file.write(">" + name + "\n")
+          out_file.write(sequence_clean + "\n")
+          all_seqs[name] = sequence_clean
+    else:
+      out_file.write(">" + name + "\n")
+      out_file.write(sequence_clean + "\n")
+      all_seqs[name] = sequence_clean
+       
   out_file.close()
 
   all_proteins = []
-  req_proteins = read_ids(argsdict['pf'])
   all_species = defaultdict(list)
   for key in all_seqs:
     pieces = key.split('_')
@@ -109,7 +115,10 @@ def get_species_from_db(argsdict):
 
   base_name = argsdict['oname']+'/tmp_'
   aln_files = []
-  #for protein in all_proteins:
+  if argsdict['pf'] != 'auto':
+    req_proteins = read_ids(argsdict['pf'])
+  else:
+    req_proteins = all_proteins
   for protein in req_proteins:
     f1s = base_name + protein + ".fa"
     f1a = base_name + protein + ".aln"
@@ -125,8 +134,7 @@ def get_species_from_db(argsdict):
       print "Working on",protein
     out_file.close()
     sysnulldev = open(os.devnull, 'w')
-    subprocess.call(['muscle','-in',f1s,'-out',f1a], 
-                     stdout=sysnulldev, stderr=sysnulldev)
+    #subprocess.call(['muscle','-in',f1s,'-out',f1a], stdout=sysnulldev, stderr=sysnulldev)
     sysnulldev.close()
 
   aln_seqs = read_many_alns(aln_files)
@@ -178,14 +186,15 @@ def filter_tree(argsdict):
       mask_str.append(1)
     else:
       mask_str.append(0)
-  #
-  f = open(argsdict['if']+"_mapping")
-  map_d = {}
-  for rawline in f:
-    line = rawline.strip()
-    pieces = line.split("\t")
-    map_d[pieces[0]] = pieces[1]
-  f.close()
+  # TROUBLE HERE
+  # no mapping for now
+  #f = open(argsdict['if']+"_mapping")
+  #map_d = {}
+  #for rawline in f:
+  #  line = rawline.strip()
+  #  pieces = line.split("\t")
+  #  map_d[pieces[0]] = pieces[1]
+  #f.close()
 
   f = open(filtered_aln_f,'w')
   for key in full_aln_d:
