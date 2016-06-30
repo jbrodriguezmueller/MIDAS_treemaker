@@ -133,10 +133,24 @@ def get_species_from_db(argsdict):
       print "Working on",key,pieces[-1]
       print "Working on",protein
     out_file.close()
-    sysnulldev = open(os.devnull, 'w')
-    subprocess.call(['muscle','-in',f1s,'-out',f1a], stdout=sysnulldev, stderr=sysnulldev)
-    sysnulldev.close()
-
+    if argsdict['muscle']==0:
+      print("Skipping the execution of muscle")
+    elif argsdict['muscle']==1:
+      sysnulldev = open(os.devnull, 'w')
+      subprocess.call(['muscle','-in',f1s,'-out',f1a,'-maxiters','1','-diags',''], stdout=sysnulldev, stderr=sysnulldev)
+      sysnulldev.close()
+    elif argsdict['muscle']==2:
+      sysnulldev = open(os.devnull, 'w')
+      subprocess.call(['muscle','-in',f1s,'-out',f1a,'-maxiters','2','-diags',''], stdout=sysnulldev, stderr=sysnulldev)
+      sysnulldev.close()
+    elif argsdict['muscle']==3:
+      sysnulldev = open(os.devnull, 'w')
+      subprocess.call(['muscle','-in',f1s,'-out',f1a], stdout=sysnulldev, stderr=sysnulldev)
+      sysnulldev.close()
+    else:
+      print("ERROR on -muscle")
+      print("Unrecognized muscle option value... bailing out")
+      exit(-1)
   aln_seqs = read_many_alns(aln_files)
   good_lens = nominal_lens(aln_seqs)
   f = open(argsdict['oname']+"/final_unfiltered.aln","w")
@@ -258,6 +272,15 @@ def main():
                       required=False, default='0')
   parser.add_argument('--debug', help='Write debug info', 
                       required=False, type=bool, default=False)
+  muscle_help="""Options for muscle: 
+                 1 : runs muscle in fast mode (-maxiters 1 -diags),
+                 2 : runs muscle in quite-fast mode (-maxiters 2 -diags), 
+                 3 : runs muscle in standard fashion (-maxiters 16)
+                 0 : generates the alignment files but DOES not run muscle
+                 (useful for big alignments that need to run in a cluster)."""
+  parser.add_argument('--muscle',
+                      help=muscle_help,
+                      required=False, type=int, default=2)
 
   args = parser.parse_args()
   argsdict = vars(args)
